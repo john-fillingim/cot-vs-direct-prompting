@@ -54,7 +54,7 @@ def fig_accuracy(cells: pd.DataFrame, h1: pd.DataFrame, out_dir: Path) -> None:
     labels = {r.model_key: model_label(r.model) for r in cells.itertuples()}
     gains = h1.set_index("model_key")["acc_diff"] * 100
     title = "CoT raises accuracy by " + " and ".join(
-        f"{gains[m]:.0f} pts ({labels[m]})" for m in MODEL_ORDER if m in gains)
+        f"{gains[m]:.1f} pts ({labels[m]})" for m in MODEL_ORDER if m in gains)
 
     fig, ax = plt.subplots(figsize=(7, 4.5))
     offset = {"direct": -0.12, "cot": 0.12}
@@ -70,7 +70,7 @@ def fig_accuracy(cells: pd.DataFrame, h1: pd.DataFrame, out_dir: Path) -> None:
             ax.errorbar(x, y, yerr=[[y - r["acc_ci_low"] * 100], [r["acc_ci_high"] * 100 - y]],
                         fmt="o", ms=9, color=COLORS[s], ecolor=COLORS[s], elinewidth=2, capsize=0,
                         mec="white", mew=1.5, zorder=2, label=STYLE_LABELS[s] if i == 0 else None)
-            ax.annotate(f"{y:.0f}%", (x, y), xytext=(-10 if s == "direct" else 10, 0),
+            ax.annotate(f"{y:.1f}%", (x, y), xytext=(-10 if s == "direct" else 10, 0),
                         textcoords="offset points", ha="right" if s == "direct" else "left",
                         va="center", color=INK, fontsize=10)
     ax.set_xticks(range(len(MODEL_ORDER)), [labels.get(m, m) for m in MODEL_ORDER])
