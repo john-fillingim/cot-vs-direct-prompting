@@ -1,0 +1,65 @@
+# Single source of truth for the experiment. Paths are relative to the repo root.
+
+seed: 510
+
+ollama:
+  host: http://localhost:11434
+  timeout_s: 900
+  max_retries: 3
+  keep_alive: 30m
+
+# Run order: models run one block at a time (4 GB GPU cannot hold both);
+# problem x prompt order is shuffled with `seed` inside each block.
+models:
+  small:
+    name: qwen2.5:1.5b
+    digest: 65ec06548149b04c096a120e4a6da9d4017ea809c91734ea5631e89f96ddc57b
+  large:
+    name: qwen2.5:7b
+    digest: 845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e
+model_order: [small, large]
+
+dataset:
+  name: openai/gsm8k
+  config: main
+  split: test
+  n_main: 200
+  n_pilot: 30   # disjoint from the main sample
+
+generation:
+  temperature: 0
+  seed: 510
+  num_predict: 512
+  num_ctx: 4096
+
+prompt_styles: [direct, cot]
+
+prompts:
+  system: "You are a helpful assistant that solves math word problems."
+  direct: |-
+    Solve the following math problem. Respond with only the final answer as a single number. Do not show any work or explanation.
+
+    Problem: {question}
+  cot: |-
+    Solve the following math problem. Think step by step and show your reasoning. Then give the final answer as a single number on the last line in the format: #### <number>
+
+    Problem: {question}
+
+power:
+  p10: 0.15
+  p01: 0.05
+  alpha: 0.025
+  power: 0.80
+
+analysis:
+  alpha_h1: 0.025
+  n_bootstrap: 10000
+
+paths:
+  problems: data/raw/problems.csv
+  responses: data/raw/responses.jsonl
+  pilot_responses: data/raw/pilot_responses.jsonl
+  clean: data/clean/results.csv
+  pilot_clean: data/clean/pilot_results.csv
+  results_dir: results
+  figures_dir: figures
